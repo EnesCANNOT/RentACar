@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CreateCarRequest {
     @NotNull
-    @Min(2000)
+    @Min(1970)
     @Max(2024)
     private int modelYear;
 
@@ -19,6 +19,7 @@ public class CreateCarRequest {
     @Max(3)
     private int state;
 
+    @Min(0)
     @NotNull
     private int kilometer;
 
@@ -29,10 +30,14 @@ public class CreateCarRequest {
     private String plate;
 
     @NotNull
-    @Min(1000)
+    @Min(1)
     private double dailyPrice;
 
     @NotNull
     @Min(1)
     private long modelId;
+
+    @NotNull
+    @Min(1)
+    private long rentalBranchId;
 }

@@ -1,8 +1,8 @@
 package com.etiya.rentacar.business.rules;
 
 import com.etiya.rentacar.business.abstracts.CarService;
-import com.etiya.rentacar.business.abstracts.CustomerService;
 import com.etiya.rentacar.business.dtos.responses.carResponses.GetCarsResponse;
+import com.etiya.rentacar.business.dtos.responses.rentalResponses.GetRentalResponse;
 import com.etiya.rentacar.business.messages.RentalMessages;
 import com.etiya.rentacar.core.exceptions.types.BusinessException;
 import com.etiya.rentacar.dataAccess.abstracts.RentalRepository;
@@ -10,6 +10,7 @@ import com.etiya.rentacar.entities.Rental;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,19 +36,32 @@ public class RentalBusinessRules {
         }
     }
 
-    public void checkIfCarState(long carId){
+    public void checkCarState(long carId){
         GetCarsResponse response = carService.findById(carId);
         if(response.getState()==2)
-            throw new BusinessException(RentalMessages.checkIfCarState2);
+            throw new BusinessException(RentalMessages.checkCarState2);
 
         if (response.getState()==3)
-            throw new BusinessException(RentalMessages.checkIfCarState3);
+            throw new BusinessException(RentalMessages.checkCarState3);
     }
 
     public void checkCustomerHasRented(long customerId) {
         List<Rental> activeRentals = rentalRepository.findByCustomerIdAndReturnDateIsNull(customerId);
         if (!activeRentals.isEmpty()) {
             throw new BusinessException(RentalMessages.checkCustomerHasRented);
+        }
+    }
+
+    public void checkDates(LocalDateTime startDate, LocalDateTime endDate){
+        if (startDate.isAfter(endDate)){
+            throw new BusinessException(RentalMessages.checkDates);
+        }
+    }
+
+    public void checkKilometer(long rentalId){
+        Rental responseRental = rentalRepository.findById(rentalId).orElse(null);
+        if (responseRental.getEndKilometer() < responseRental.getStartKilometer()) {
+            throw new BusinessException(RentalMessages.checkKilometers);
         }
     }
 }

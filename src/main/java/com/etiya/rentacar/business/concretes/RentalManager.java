@@ -10,7 +10,6 @@ import com.etiya.rentacar.business.dtos.responses.rentalResponses.*;
 import com.etiya.rentacar.business.rules.RentalBusinessRules;
 import com.etiya.rentacar.core.utilities.mapping.ModelMapperService;
 import com.etiya.rentacar.dataAccess.abstracts.RentalRepository;
-import com.etiya.rentacar.entities.Car;
 import com.etiya.rentacar.entities.Customer;
 import com.etiya.rentacar.entities.Rental;
 import lombok.AllArgsConstructor;
@@ -52,7 +51,8 @@ public class RentalManager implements RentalService {
 
     @Override
     public CreatedRentalResponse add(CreateRentalRequest createRentalRequest) {
-        rentalBusinessRules.checkIfCarState(createRentalRequest.getCarId());
+        rentalBusinessRules.checkDates(createRentalRequest.getStartDate(), createRentalRequest.getEndDate());
+        rentalBusinessRules.checkCarState(createRentalRequest.getCarId());
         rentalBusinessRules.checkCustomerHasRented(createRentalRequest.getCustomerId());
 
         GetCarsResponse getCarResponse = carService.findById(createRentalRequest.getCarId());
@@ -74,6 +74,7 @@ public class RentalManager implements RentalService {
 
     @Override
     public ReturnedRentalResponse returnRental(ReturnRentalRequest returnRentalRequest, long id) {
+        rentalBusinessRules.checkKilometer(id);
         rentalBusinessRules.rentalNotFound(id);
         rentalBusinessRules.deletedRental(id);
 
@@ -102,7 +103,7 @@ public class RentalManager implements RentalService {
 
     @Override
     public UpdatedRentalResponse update(UpdateRentalRequest updateRentalRequest, long id) {
-        rentalBusinessRules.checkIfCarState(updateRentalRequest.getCarId());
+        rentalBusinessRules.checkCarState(updateRentalRequest.getCarId());
         rentalBusinessRules.rentalNotFound(id);
         rentalBusinessRules.deletedRental(id);
 
